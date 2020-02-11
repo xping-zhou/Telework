@@ -1,0 +1,77 @@
+import matplotlib.pyplot as plt
+import os
+import numpy as np 
+
+logfile_path = "C:\\A-Source\\xping\\Tiandy\\2020-2-10~17\\mmz.log"
+def mmzCureShow(log_path, flg="used"):
+    print(log_path)
+    # , encoding='utf-8'
+    with open(log_path, 'r') as logfile:
+        logLines = logfile.readlines()
+        
+        totalSizeList = []
+        usedSizeList = []
+        remainSizeList = []
+        IterationList = []
+        IterationCnt = 0
+        for dataLine in logLines:
+            if flg=="all":
+                usedIdx = dataLine.find("used")
+                if usedIdx != -1:
+                    #total size
+                    acStrBuf = dataLine
+                    acStrBuf = acStrBuf.split(",")[0]
+                    acStrBuf = acStrBuf.split("=")[1]
+                    acStrBuf = acStrBuf.split("K")[0]
+                    totalSizeList.append(int(acStrBuf))
+                    
+                    #used
+                    acStrBuf = dataLine
+                    acStrBuf = acStrBuf.split(",")[1]
+                    acStrBuf = acStrBuf.split("(")[0]
+                    acStrBuf = acStrBuf.split("=")[1]
+                    acStrBuf = acStrBuf.split("K")[0]
+                    usedSizeList.append(int(acStrBuf))
+                    
+                    #remain
+                    acStrBuf = dataLine
+                    acStrBuf = acStrBuf.split(",")[2]
+                    acStrBuf = acStrBuf.split("(")[0]
+                    acStrBuf = acStrBuf.split("=")[1]
+                    acStrBuf = acStrBuf.split("K")[0]
+                    remainSizeList.append(int(acStrBuf))
+
+                    IterationList.append(IterationCnt)
+                    IterationCnt += 1
+
+            if flg=="used":
+                usedIdx = dataLine.find("used")
+                if usedIdx != -1:
+                    acStrBuf = dataLine[usedIdx:]
+                    acStrBuf = acStrBuf.split(",")[0]
+                    acStrBuf = acStrBuf.split("(")[0]
+                    acStrBuf = acStrBuf.split("=")[1]
+                    acStrBuf = acStrBuf.split("K")[0]
+                    usedSizeList.append(int(acStrBuf))
+                    IterationList.append(IterationCnt)
+                    IterationCnt += 1
+        
+        fig, ax = plt.subplots()
+        if flg=="all":
+            ax.plot(IterationList, totalSizeList, label='totalSize')
+            ax.plot(IterationList, usedSizeList, label='used')
+            ax.plot(IterationList, remainSizeList, label='remain')
+        
+        if flg=="used": 
+            ax.plot(IterationList, usedSizeList, label='used')
+        
+        ax.set(ylabel='Memory (KB)', xlabel='Time', title='Memory monitoring')
+        ax.legend()
+        plt.show()
+        
+        
+        
+
+if __name__ == "__main__":
+
+    mmzCureShow(logfile_path, flg="used")
